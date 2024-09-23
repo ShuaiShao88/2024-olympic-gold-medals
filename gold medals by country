@@ -1,0 +1,47 @@
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load your dataset (/workspaces/2024-olympic-gold-medals/medals_total.csv)
+@st.cache
+def load_data():
+    return pd.read_csv('medals_total.csv')
+
+# Load data
+df = load_data()
+
+# Title of the app
+st.title("Gold Medals by Country")
+
+# Display the dataset
+st.subheader("Gold Medal Counts Sorted by Country")
+st.write(df)
+
+# Select a country or display all
+st.subheader("Filter by Country")
+country_list = df['Country'].unique()
+selected_country = st.selectbox("Select a Country", ['All'] + list(country_list))
+
+# Filter data based on the selected country
+if selected_country == 'All':
+    filtered_data = df
+else:
+    filtered_data = df[df['Country'] == selected_country]
+
+# Display filtered data
+st.write(filtered_data)
+
+# Plot the data
+st.subheader("Gold Medal Distribution")
+fig, ax = plt.subplots()
+
+if selected_country == 'All':
+    df_sorted = df.sort_values(by='Gold Medals', ascending=False)
+    ax.barh(df_sorted['Country'], df_sorted['Gold Medals'], color='gold')
+    ax.set_xlabel("Number of Gold Medals")
+    ax.set_ylabel("Country")
+else:
+    ax.barh(filtered_data['Country'], filtered_data['Gold Medals'], color='gold')
+    ax.set_xlabel("Number of Gold Medals")
+
+st.pyplot(fig)
